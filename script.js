@@ -3,7 +3,9 @@
         particleMinRad: 6,
         particleMaxRad: 20,
         massFactor: 0.002,
-        particleColor: 'rgba(250, 10, 30, 0.9)'
+        particleColor: 'rgba(250, 10, 30, 0.9)',
+        smooth: 0.95,
+        sphereRad: 300
     };
 
     const THO_PI = 2 * Math.PI;
@@ -32,7 +34,7 @@
     }
     
     function updateParticles  () {
-        for (let i = 1; i < particles.length; i++) {
+        for (let i = 0; i < particles.length; i++) {
             let acceleration = {x: 0, y: 0};
             for(let j = 0; j < particles.length; j++) {
                 if (i === j) continue;
@@ -44,16 +46,16 @@
                     y: second_particle.pos.y - first_particle.pos.y
                 };
 
-                let dist = Math.sqrt(Math.pow(delta.x, 2) + Math.pow(delta.y, 2));
+                let dist = Math.sqrt(delta.x * delta.x + delta.y * delta.y) || 1;
 
-                let force = second_particle.mass;
+                let force  = (dist - config.sphereRad) / dist * second_particle.mass;
 
                 acceleration.x += delta.x * force;
                 acceleration.y += delta.y * force;
             }
 
-            particles[i].vel.x = particles[i].vel.x + acceleration.x * particles[i].mass;
-            particles[i].vel.y = particles[i].vel.y + acceleration.y * particles[i].mass;
+            particles[i].vel.x = particles[i].vel.x * config.smooth + acceleration.x * particles[i].mass;
+            particles[i].vel.y = particles[i].vel.y * config.smooth + acceleration.y * particles[i].mass;
         }
     }
 
